@@ -4,3 +4,4 @@
 dwh.cfg
 .vscode
 create_cluster*
+__pycache__
