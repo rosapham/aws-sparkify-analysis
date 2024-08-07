@@ -159,7 +159,7 @@ songplay_table_insert = """
               userAgent as user_agent
     FROM staging_events se
     JOIN staging_songs ss
-    ON se.song = ss.title AND se.artist = ss.artist_name
+    ON se.song = ss.title AND se.artist = ss.artist_name AND se.length = ss.duration
     WHERE page = 'NextSong'
 """
 
