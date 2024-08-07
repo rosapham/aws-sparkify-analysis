@@ -27,7 +27,7 @@ staging_events_table_create = """
     auth        	varchar,
     firstName     	varchar,
     gender        	varchar,
-    itemInSession   integer not null,
+    itemInSession   integer,
     lastName      	varchar,
     length       	varchar,
     level        	varchar,
@@ -35,7 +35,7 @@ staging_events_table_create = """
     method     	    varchar,
     page        	varchar,
     registration    varchar,
-    sessionId      	integer not null,
+    sessionId      	integer,
     song        	varchar,
     status      	integer,
     ts          	bigint,
@@ -48,12 +48,12 @@ staging_events_table_create = """
 staging_songs_table_create = """
     CREATE TABLE staging_songs (
         num_songs          integer,
-        artist_id          varchar not null,
+        artist_id          varchar,
         artist_latitude    float,
         artist_longitude   float,
         artist_location    varchar,
         artist_name        varchar,
-        song_id            varchar not null,
+        song_id            varchar,
         title              varchar,
         duration           float,
         year               integer
@@ -64,12 +64,12 @@ staging_songs_table_create = """
 songplay_table_create = """
     CREATE TABLE songplays (
         songplay_id    integer identity(0,1) primary key,
-        start_time     timestamp not null sortkey distkey,
-        user_id        integer not null,
+        start_time     timestamp sortkey distkey,
+        user_id        integer,
         level          varchar,
-        song_id        varchar not null,
-        artist_id      varchar not null,
-        session_id     integer not null,
+        song_id        varchar,
+        artist_id      varchar,
+        session_id     integer,
         location       varchar,
         user_agent     varchar
     );
@@ -91,7 +91,7 @@ song_table_create = """
     CREATE TABLE songs (
         song_id     varchar primary key sortkey,
         title       varchar,
-        artist_id   varchar not null,
+        artist_id   varchar,
         year        integer,
         duration    float
     );
@@ -160,7 +160,8 @@ songplay_table_insert = """
     FROM staging_events se
     JOIN staging_songs ss
     ON se.song = ss.title AND se.artist = ss.artist_name AND se.length = ss.duration
-    WHERE page = 'NextSong'
+    WHERE page = 'NextSong' AND userId IS NOT NULL AND song_id IS NOT NULL AND artist_id IS NOT NULL
+        AND ts IS NOT NULL
 """
 
 user_table_insert = """
@@ -182,6 +183,7 @@ song_table_insert = """
               year,
               duration
     FROM staging_songs
+    WHERE song_id IS NOT NULL
 """
 
 artist_table_insert = """
@@ -192,6 +194,7 @@ artist_table_insert = """
               artist_latitude as latitude,
               artist_longitude as longitude
     FROM staging_songs
+    WHERE artist_id IS NOT NULL
 """
 
 time_table_insert = """
