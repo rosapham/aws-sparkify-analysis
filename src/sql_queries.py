@@ -1,6 +1,6 @@
 import configparser
 
-# CONFIG
+# Get the configuration values from the dwh.cfg file
 config = configparser.ConfigParser()
 config.read("./dwh.cfg")
 
@@ -9,8 +9,8 @@ LOG_DATA = config.get("S3", "LOG_DATA")
 LOG_JSONPATH = config.get("S3", "LOG_JSONPATH")
 DWH_ROLE_ARN = config.get("IAM_ROLE", "ARN")
 
-# DROP TABLES
 
+# DROP ALL TABLES
 staging_events_table_drop = "DROP TABLE IF EXISTS staging_events;"
 staging_songs_table_drop = "DROP TABLE IF EXISTS staging_songs;"
 songplay_table_drop = "DROP TABLE IF EXISTS songplays;"
@@ -20,7 +20,7 @@ artist_table_drop = "DROP TABLE IF EXISTS artists;"
 time_table_drop = "DROP TABLE IF EXISTS time;"
 
 # CREATE TABLES
-
+# Create the staging_events table
 staging_events_table_create = """
     CREATE TABLE staging_events (
     artist     	    varchar,
@@ -44,6 +44,7 @@ staging_events_table_create = """
     );
 """
 
+# Create the staging_songs table
 staging_songs_table_create = """
     CREATE TABLE staging_songs (
         num_songs          integer,
@@ -59,6 +60,7 @@ staging_songs_table_create = """
     );
 """
 
+# Create the fact songplays table
 songplay_table_create = """
     CREATE TABLE songplays (
         songplay_id    integer identity(0,1) primary key,
@@ -73,6 +75,7 @@ songplay_table_create = """
     );
 """
 
+# Create the dimension users table
 user_table_create = """
     CREATE TABLE users (
         user_id     integer primary key sortkey,
@@ -83,6 +86,7 @@ user_table_create = """
     );
 """
 
+# Create the dimension songs table
 song_table_create = """
     CREATE TABLE songs (
         song_id     varchar primary key sortkey,
@@ -93,6 +97,7 @@ song_table_create = """
     );
 """
 
+# Create the dimension artists table
 artist_table_create = """
     CREATE TABLE artists (
         artist_id   varchar primary key sortkey,
@@ -103,6 +108,7 @@ artist_table_create = """
     );
 """
 
+# Create the dimension time table
 time_table_create = """
     CREATE TABLE time (
         start_time  timestamp primary key sortkey,
@@ -115,7 +121,7 @@ time_table_create = """
     );
 """
 
-# STAGING TABLES
+# COPY DATA FROM S3 INTO STAGING TABLES
 
 staging_events_copy = (
     """
@@ -138,7 +144,7 @@ staging_songs_copy = (
 """
 ).format(SONG_DATA, DWH_ROLE_ARN)
 
-# FINAL TABLES
+# INSERT VALUES INTO THE FACT AND DIMENSION TABLES
 
 songplay_table_insert = """
     INSERT INTO songplays (start_time, user_id, level, song_id, artist_id, session_id,
