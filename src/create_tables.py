@@ -5,6 +5,11 @@ import psycopg2
 
 from sql_queries import create_table_queries, drop_table_queries
 
+"""
+Drop all tables if existed in the database
+Params: cur: cursor object, conn: connection object
+"""
+
 
 def drop_tables(cur: Any, conn: Any) -> None:
     for query in drop_table_queries:
@@ -12,10 +17,22 @@ def drop_tables(cur: Any, conn: Any) -> None:
         conn.commit()
 
 
+"""
+Create staging and analytics tables in the database
+Params: cur: cursor object, conn: connection object
+"""
+
+
 def create_tables(cur: Any, conn: Any) -> None:
     for query in create_table_queries:
         cur.execute(query)
         conn.commit()
+
+
+"""
+Connect to the database in Redshift
+Drop all tables if existed and create new tables
+"""
 
 
 def main() -> None:
