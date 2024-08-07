@@ -3,5 +3,5 @@
 .DS_Store
 dwh.cfg
 .vscode
-create_cluster*
 __pycache__
+setup.md
