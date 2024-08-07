@@ -23,37 +23,37 @@ time_table_drop = "DROP TABLE IF EXISTS time;"
 
 staging_events_table_create = """
     CREATE TABLE staging_events (
-    artist     	    varchar(100),
-    auth        	varchar(25),
-    firstName     	varchar(25),
-    gender        	varchar(1),
+    artist     	    varchar,
+    auth        	varchar,
+    firstName     	varchar,
+    gender        	varchar,
     itemInSession   integer not null,
-    lastName      	varchar(25),
-    length       	varchar(15),
-    level        	varchar(10),
-    location    	varchar(50),
-    method     	    varchar(10),
-    page        	varchar(25),
-    registration    integer,
+    lastName      	varchar,
+    length       	varchar,
+    level        	varchar,
+    location    	varchar,
+    method     	    varchar,
+    page        	varchar,
+    registration    varchar,
     sessionId      	integer not null,
     song        	varchar(100),
     status      	integer,
-    ts          	integer,
+    ts          	bigint,
     userAgent      	varchar(150),
-    userId      	integer not null
+    userId      	integer
     );
 """
 
 staging_songs_table_create = """
     CREATE TABLE staging_songs (
         num_songs          integer,
-        artist_id          varchar(100) not null,
+        artist_id          varchar not null,
         artist_latitude    float,
         artist_longitude   float,
-        artist_location    varchar(100),
-        artist_name        varchar(100),
-        song_id            varchar(100) not null,
-        title              varchar(100),
+        artist_location    varchar,
+        artist_name        varchar,
+        song_id            varchar not null,
+        title              varchar,
         duration           float,
         year               integer
     );
@@ -64,30 +64,30 @@ songplay_table_create = """
         songplay_id    integer identity(0,1) primary key,
         start_time     timestamp not null sortkey distkey,
         user_id        integer not null,
-        level          varchar(10),
-        song_id        varchar(100) not null,
-        artist_id      varchar(100) not null,
+        level          varchar,
+        song_id        varchar not null,
+        artist_id      varchar not null,
         session_id     integer not null,
-        location       varchar(50),
-        user_agent     varchar(150)
+        location       varchar,
+        user_agent     varchar
     );
 """
 
 user_table_create = """
     CREATE TABLE users (
         user_id     integer primary key sortkey,
-        first_name  varchar(25),
-        last_name   varchar(25),
-        gender      varchar(1),
-        level       varchar(10)
+        first_name  varchar,
+        last_name   varchar,
+        gender      varchar,
+        level       varchar
     );
 """
 
 song_table_create = """
     CREATE TABLE songs (
-        song_id     varchar(100) primary key sortkey,
-        title       varchar(100),
-        artist_id   varchar(100) not null,
+        song_id     varchar primary key sortkey,
+        title       varchar,
+        artist_id   varchar not null,
         year        integer,
         duration    float
     );
@@ -95,9 +95,9 @@ song_table_create = """
 
 artist_table_create = """
     CREATE TABLE artists (
-        artist_id   varchar(100) primary key sortkey,
-        name        varchar(100),
-        location    varchar(100),
+        artist_id   varchar primary key sortkey,
+        name        varchar,
+        location    varchar,
         latitude    float,
         longitude   float
     );
@@ -119,13 +119,24 @@ time_table_create = """
 
 staging_events_copy = (
     """
+    copy staging_events from {}
+    credentials 'aws_iam_role={}'
+    region 'us-west-2'
+    json {}
+    TIMEFORMAT as 'epochmillisecs'
+    TRUNCATECOLUMNS BLANKSASNULL EMPTYASNULL;
 """
-).format()
+).format(LOG_DATA, DWH_ROLE_ARN, LOG_JSONPATH)
 
 staging_songs_copy = (
     """
+    copy staging_songs from {}
+    credentials 'aws_iam_role={}'
+    region 'us-west-2'
+    json 'auto'
+    TRUNCATECOLUMNS BLANKSASNULL EMPTYASNULL;
 """
-).format()
+).format(SONG_DATA, DWH_ROLE_ARN)
 
 # FINAL TABLES
 
